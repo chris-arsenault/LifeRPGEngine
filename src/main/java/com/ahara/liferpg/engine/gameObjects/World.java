@@ -48,4 +48,5 @@ public class World extends GameObject {
         t1.setLocation(t2.x(), t2.y());
         t2.setLocation(t1.x(), t1.y());
     }
+
 }
