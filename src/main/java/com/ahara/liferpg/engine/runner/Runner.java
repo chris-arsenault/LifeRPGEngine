@@ -1,20 +1,34 @@
 package com.ahara.liferpg.engine.runner;
-
-
 import com.ahara.liferpg.engine.gameObjects.World;
 import com.ahara.liferpg.engine.rules.GameRule;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
+@Service
 public class Runner {
-    private static Integer STEP_LENGTH = 10;
+
+    private static Integer STEP_LENGTH = 1000;
 
     private World _w;
     private ArrayList<GameRule> _r;
+    private RedisConnection _c;
+    private RedisSerializer<String> serializer = new StringRedisSerializer();
 
-    public Runner() {
+    @Autowired
+    public Runner(LettuceConnectionFactory factory) {
         _w = WorldInitalizer.initializeWorld();
         _r = RuleInitializer.initializeRules();
+        _c = factory.getConnection();
     }
 
     public void runGame() {
@@ -46,7 +60,8 @@ public class Runner {
         //Run Pieces
         _w.allObjects().forEach((g) -> _r.forEach((r) -> r.applyTo(g)));
         //Garbage Collect
-        //Save Board State
+        //Save Board State(
+        _c.set(serializer.serialize("World"), serializer.serialize("popo"));
         //Print BoardState
     }
 }
