@@ -1,6 +1,8 @@
 package com.ahara.liferpg.engine.runner;
 import com.ahara.liferpg.engine.gameObjects.World;
 import com.ahara.liferpg.engine.rules.GameRule;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.redis.connection.RedisConnection;
@@ -23,12 +25,15 @@ public class Runner {
     private ArrayList<GameRule> _r;
     private RedisConnection _c;
     private RedisSerializer<String> serializer = new StringRedisSerializer();
+    private Gson gson;
 
     @Autowired
-    public Runner(LettuceConnectionFactory factory) {
+    public Runner(LettuceConnectionFactory factory, GsonBuilder gsonBuilder) {
         _w = WorldInitalizer.initializeWorld();
         _r = RuleInitializer.initializeRules();
         _c = factory.getConnection();
+
+        gson = gsonBuilder.create();
     }
 
     public void runGame() {
@@ -50,7 +55,7 @@ public class Runner {
                 Thread.sleep(sleep);
             }
             catch (Exception e) {
-
+                System.out.println(e.getMessage());
             }
         }
     }
@@ -60,8 +65,9 @@ public class Runner {
         //Run Pieces
         _w.allObjects().forEach((g) -> _r.forEach((r) -> r.applyTo(g)));
         //Garbage Collect
-        //Save Board State(
-        _c.set(serializer.serialize("World"), serializer.serialize("popo"));
+        //Save Board State
+        String p = gson.toJson(_w);
+        _c.set(serializer.serialize("World"), serializer.serialize(p));
         //Print BoardState
     }
 }
