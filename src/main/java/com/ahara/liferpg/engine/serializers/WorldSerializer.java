@@ -7,10 +7,12 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Type;
 
-@Service
 public class WorldSerializer implements  JsonSerializer<World> {
-    @Autowired
-    GsonBuilder gsonBuilder;
+    private GsonBuilder gsonBuilder;
+
+    public WorldSerializer(GsonBuilder g) {
+        gsonBuilder = g;
+    }
 
     @Override
     public JsonElement serialize(final World world, final Type typeOfSrc, final JsonSerializationContext context) {

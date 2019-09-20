@@ -10,18 +10,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SerializerConfiguration {
 
-    @Autowired
-    WorldSerializer worldSerializer;
-
-    @Autowired
-    UnitSerializer unitSerializer;
-
     @Bean
     GsonBuilder gsonBuilder() {
         final GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(World.class, worldSerializer);
-        gsonBuilder.registerTypeAdapter(Unit.class, unitSerializer);
-        gsonBuilder.setPrettyPrinting();
+        gsonBuilder.registerTypeAdapter(World.class, new WorldSerializer(gsonBuilder));
+        gsonBuilder.registerTypeAdapter(Unit.class, new UnitSerializer());
+//        gsonBuilder.setPrettyPrinting();
 
         return gsonBuilder;
     }
